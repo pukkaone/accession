@@ -1,0 +1,38 @@
+!**/src/main/**/build/
+!**/src/test/**/build/
+!gradle/wrapper/gradle-wrapper.jar
+.DS_Store
+.gradle/
+build/
+target/
+
+# Spring Tool Suite
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+# IntelliJ IDEA
+!**/src/main/**/out/
+!**/src/test/**/out/
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# NetBeans
+/.nb-gradle/
+/dist/
+/nbbuild/
+/nbproject/private/
+/nbdist/
+
+# VS Code
+.vscode/
