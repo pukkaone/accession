@@ -1,0 +1,27 @@
+!gradle/wrapper/gradle-wrapper.jar
+.DS_Store
+.gradle/
+target/
+
+# Spring Tool Suite
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# NetBeans
+.nb-gradle/
+build/
+dist/
+nbbuild/
+nbdist/
+nbproject/private/
