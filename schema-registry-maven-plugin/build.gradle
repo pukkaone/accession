@@ -1,0 +1,59 @@
+plugins {
+  id 'organization.library-convention'
+}
+
+description = 'Maven plugin that puts schema in schema registry'
+
+ext {
+  autoServiceVersion = '1.0.1'
+  mavenVersion = '3.8.6'
+  mavenPluginVersion = '3.6.4'
+}
+
+dependencies {
+  implementation project(':schema-registry-core')
+  annotationProcessor "com.google.auto.service:auto-service:${autoServiceVersion}"
+  compileOnly "com.google.auto.service:auto-service-annotations:${autoServiceVersion}"
+  implementation "org.apache.maven:maven-artifact:${mavenVersion}"
+  implementation "org.apache.maven:maven-compat:${mavenVersion}"
+  implementation "org.apache.maven:maven-plugin-api:${mavenVersion}"
+  compileOnly "org.apache.maven.plugin-tools:maven-plugin-annotations:${mavenPluginVersion}"
+  implementation 'org.apache.maven.shared:file-management:3.1.0'
+  implementation 'org.eclipse.jgit:org.eclipse.jgit.ssh.apache:6.3.0.202209071007-r'
+}
+
+publishing {
+  publications {
+    library {
+      pom {
+        packaging = 'maven-plugin'
+        withXml {
+          asNode()
+              .appendNode('build')
+              .appendNode('outputDirectory', 'classes/java/main')
+          asNode().dependencies.'*'
+              .findAll() { it.groupId.text() == 'org.apache.maven' && it.scope.text() == 'runtime' }
+              .each { it.scope*.value = 'provided' }
+        }
+      }
+    }
+  }
+}
+
+model {
+  tasks.generatePomFileForLibraryPublication {
+    destination = file("${buildDir}/pom.xml")
+  }
+}
+
+task generatePluginDescriptor(type: Exec) {
+  dependsOn generatePomFileForLibraryPublication
+  workingDir buildDir
+  commandLine "${rootDir}/mvnw", '--batch-mode', '--errors', "org.apache.maven.plugins:maven-plugin-plugin:${mavenPluginVersion}:descriptor"
+}
+
+repositories {
+  mavenCentral()
+}
+
+jar.dependsOn(generatePluginDescriptor)

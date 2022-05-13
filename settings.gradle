@@ -1,0 +1,4 @@
+rootProject.name = 'accession'
+include 'schema-registry-core'
+include 'schema-registry-maven-plugin'
+include 'schema-registry-server'
