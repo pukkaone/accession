@@ -1,0 +1,66 @@
+= Accession Schema Registry
+
+This is a schema registry that stores schemas in a Git repository.
+It exposes an API compatible with the
+https://docs.confluent.io/current/schema-registry/develop/api.html[Confluent schema registry].
+
+
+== Schema registry Maven plugin
+
+This Maven plugin puts a schema into the schema registry.
+
+[source,xml]
+----
+<plugin>
+  <groupId>com.github.pukkaone.accession</groupId>
+  <artifactId>schema-registry-maven-plugin</artifactId>
+  <version>${accession.version}</version>
+  <configuration>
+    <registryRepositories> <1>
+      <registryRepository>
+        <projectBranchPattern>main</projectBranchPattern>
+        <registryUri>ssh://git@example.com/example/schema-registry.git</registryUri>
+        <registryBranch>main</registryBranch>
+        <mutableVersions>false</mutableVersions>
+      </registryRepository>
+      <registryRepository>
+        <projectBranchPattern>.*</projectBranchPattern>
+        <registryUri>ssh://git@example.com/example/schema-registry.git</registryUri>
+        <registryBranch>develop</registryBranch>
+        <mutableVersions>true</mutableVersions>
+      </registryRepository>
+    </registryRepositories>
+    <registrations>
+      <registration>
+        <subject>topic</subject>
+        <version>1</version>
+        <reflectClass>com.example.Event</reflectClass>
+      </registration>
+    </registrations>
+  </configuration>
+  <executions>
+    <execution>
+      <phase>deploy</phase>
+      <goals>
+        <goal>register</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
+----
+<1> List of rules to select which Git repository and branch will store the schemas. Only the first
+    matching rule applies. A rule matches if the `projectBranchPattern` regular expression matches
+    the project's checked-out Git branch.
+
+[cols="1,3"]
+|===
+|Parameter |Description
+
+|`projectBranchPattern` |Regular expression to match project checked-out Git branch.
+|`registryUri` |Schema registry Git repository URI
+|`registryBranch` |Schema registry Git branch
+|`mutableVersions` |Whether to allow changing the schema of an existing version
+|`subject` |Kafka topic
+|`version` |integer (1 to 999) uniquely identifying the version within the subject
+|`reflectClass` |Java class to introspect to generate Avro schema
+|===
