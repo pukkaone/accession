@@ -1,0 +1,88 @@
+= Accession Schema Registry
+
+This schema registry stores schemas in a Git repository.  It consists of these components:
+
+  * A Maven plugin puts schemas into the schema registry.
+  * A server provides schemas from the schema registry. It exposes an API compatible with the
+https://docs.confluent.io/current/schema-registry/develop/api.html[Confluent schema registry].
+
+
+== Schema registry Maven plugin
+
+This Maven plugin puts a schema into the schema registry.  If a new schema is
+incompatible with registered schemas, then the plugin fails the Maven build.
+
+[source,xml]
+----
+<plugin>
+  <groupId>com.github.pukkaone.accession</groupId>
+  <artifactId>schema-registry-maven-plugin</artifactId>
+  <version>${accession.version}</version>
+  <configuration>
+    <compatibility>FORWARD</compatibility>
+    <registryRepositories>
+      <registryRepository>
+        <projectBranchPattern>main</projectBranchPattern>
+        <registryUri>ssh://git@example.com/example/schema-registry.git</registryUri>
+        <registryBranch>main</registryBranch>
+        <mutableVersions>false</mutableVersions>
+      </registryRepository>
+      <registryRepository>
+        <projectBranchPattern>.*</projectBranchPattern>
+        <registryUri>ssh://git@example.com/example/schema-registry.git</registryUri>
+        <registryBranch>develop</registryBranch>
+        <mutableVersions>true</mutableVersions>
+      </registryRepository>
+    </registryRepositories>
+    <registrations>
+      <registration>
+        <subject>topic</subject>
+        <version>1</version>
+        <reflectClass>com.example.Event</reflectClass>
+      </registration>
+    </registrations>
+  </configuration>
+  <executions>
+    <execution>
+      <phase>deploy</phase>
+      <goals>
+        <goal>register</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
+----
+
+[cols="1,3"]
+|===
+|Parameter |Description
+
+|`compatibility` |How to compare new schema to registered schema for compatibility.
+Allowed values are BACKWARD, FORWARD, FULL.  Default is FORWARD.
+|`registryRepositories` |Rules to select which Git repository and branch will
+store the schemas.  Only the first matching rule applies.  A rule matches if
+the `projectBranchPattern` regular expression matches the project's checked-out
+Git branch.
+|`projectBranchPattern` |Regular expression to match project checked-out Git branch.
+|`registryUri` |Schema registry Git repository URI
+|`registryBranch` |Schema registry Git branch
+|`mutableVersions` |Whether to allow changing the schema of an existing version
+|`registrations` |Requests to register a schema in a subject and version
+|`subject` |Scope in which schemas can evolve. If the subject does not end with
+`-key` or `-value`, then `-value` is implicitly appended to the subject.
+|`version` |integer (0 to 999) uniquely identifying the version within the subject
+|`reflectClass` |Java class to introspect to generate Avro schema
+|===
+
+The above example shows the intent to forbid changing schemas registered in
+the `main` branch of the Git repository, by setting the `mutableVersions`
+parameter to false.  If the `version` parameter specifies a version already
+existing in the schema registry, then the plugin verifies the schema to be
+registered is identical to the schema in the existing version.  An attempt to
+register a different schema in an existing version causes the plugin to fail
+the Maven build.
+
+To allow work in progress schema changes to a version, the `mutableVersions`
+parameter is true for the `develop` branch of the Git repository.  If the
+`version` parameter specifies a version already existing in the schema
+registry, then the plugin replaces the schema in that version.

@@ -1,0 +1,20 @@
+plugins {
+  id 'groovy-gradle-plugin'
+}
+
+repositories {
+  gradlePluginPortal()
+}
+
+dependencies {
+  implementation 'org.eclipse.jgit:org.eclipse.jgit:6.9.0.202403050737-r'
+}
+
+gradlePlugin {
+  plugins {
+    projectVersion {
+      id = 'organization.project-version'
+      implementationClass = 'organization.ProjectVersionPlugin'
+    }
+  }
+}

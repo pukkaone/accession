@@ -1,0 +1,20 @@
+{
+  "type" : "record",
+  "name" : "Event",
+  "namespace" : "com.example.schema.registry",
+  "fields" : [ {
+    "name" : "updatedAt",
+    "type" : [ "null", {
+      "type" : "string",
+      "CustomEncoding" : "com.github.pukkaone.accession.avro.reflect.InstantEncoding",
+      "java-class" : "java.time.Instant"
+    } ],
+    "default" : null
+  }, {
+    "name" : "updatedBy",
+    "type" : "string"
+  }, {
+    "name" : "source",
+    "type" : "string"
+  } ]
+}
