@@ -1,0 +1,85 @@
+import groovy.xml.XmlParser
+
+plugins {
+  id 'organization.library-convention'
+}
+
+description = 'Maven plugin that puts schema in schema registry'
+
+ext {
+  autoServiceVersion = '1.1.0'
+  mavenVersion = '3.9.2'
+  mavenPluginVersion = '3.9.0'
+}
+
+dependencies {
+  implementation project(':schema-registry-core')
+  annotationProcessor "com.google.auto.service:auto-service:${autoServiceVersion}"
+  compileOnly "com.google.auto.service:auto-service-annotations:${autoServiceVersion}"
+  implementation "org.apache.maven:maven-core:${mavenVersion}"
+  implementation "org.apache.maven:maven-plugin-api:${mavenVersion}"
+  compileOnly "org.apache.maven.plugin-tools:maven-plugin-annotations:${mavenPluginVersion}"
+  implementation 'org.eclipse.jgit:org.eclipse.jgit.ssh.apache'
+}
+
+publishing {
+  publications {
+    library {
+      pom {
+        packaging = 'maven-plugin'
+        withXml {
+          // Gradle generated dependencies with runtime scope but Maven wants provided scope.
+          asNode().dependencies.'*'
+              .findAll() { it.groupId.text() == 'org.apache.maven' && it.scope.text() == 'runtime' }
+              .each { it.scope*.value = 'provided' }
+          asNode()
+              .append(new XmlParser().parseText("""
+  <build>
+    <outputDirectory>classes/java/main</outputDirectory>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>${mavenPluginVersion}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.reporting</groupId>
+              <artifactId>maven-reporting-impl</artifactId>
+              <version>3.0.0</version>
+              <!--
+              Do not download vulnerable JAR file so security scan does not find it.
+              https://nvd.nist.gov/vuln/detail/CVE-2016-1181
+              -->
+              <exclusions>
+                <exclusion>
+                  <groupId>org.apache.struts</groupId>
+                  <artifactId>struts-core</artifactId>
+                </exclusion>
+              </exclusions>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+  """))
+        }
+      }
+    }
+  }
+}
+
+model {
+  tasks.generatePomFileForLibraryPublication {
+    destination = file("${buildDir}/pom.xml")
+  }
+}
+
+task generatePluginDescriptor(type: Exec) {
+  dependsOn generatePomFileForLibraryPublication
+  workingDir buildDir
+  commandLine "${rootDir}/mvnw", '--batch-mode', '--errors', 'plugin:descriptor'
+}
+
+jar.dependsOn(generatePluginDescriptor)
