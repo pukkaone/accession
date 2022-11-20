@@ -1,0 +1,9 @@
+plugins {
+  id 'organization.library-convention'
+}
+
+description = 'Schema registry core library'
+
+dependencies {
+  api 'org.apache.avro:avro:1.11.1'
+}
