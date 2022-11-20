@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: paas-schema-registry
+  cloud:
+    config:
+      label: ms
+      uri: http://paas-config-server.infra.aucn.io:8888
+  main.banner-mode: 'off'
+
+encrypt:
+  failOnError: true
