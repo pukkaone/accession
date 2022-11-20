@@ -1,0 +1,8 @@
+schema.registry.server.git:
+  label: main
+
+server:
+  servlet.context-path: /
+
+spring:
+  main.banner-mode: 'off'

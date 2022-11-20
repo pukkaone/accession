@@ -1,0 +1,108 @@
+plugins {
+  id 'checkstyle'
+  id 'java-library'
+  id 'maven-publish'
+  id 'signing'
+}
+
+group = 'com.github.pukkaone.accession'
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+ext {
+  springBootVersion = '3.3.8'
+}
+
+dependencies {
+  annotationProcessor 'org.projectlombok:lombok'
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+  compileOnly platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+  implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+  implementation platform('org.springframework.cloud:spring-cloud-dependencies:2023.0.5')
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+java {
+  compileJava {
+    options.compilerArgs << '-parameters'
+  }
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(17)
+  }
+  withJavadocJar()
+  withSourcesJar()
+}
+
+javadoc {
+  options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+checkstyle {
+  toolVersion = '10.21.2'
+}
+
+test {
+  useJUnitPlatform()
+}
+
+jar {
+  manifest {
+    attributes(
+        'Automatic-Module-Name': "${project.group}.${project.name}".replace('-', '.'),
+        'Implementation-Version': project.version)
+  }
+}
+
+publishing {
+  publications {
+    library(MavenPublication) {
+      from components.java
+      pom {
+        name = project.name
+        afterEvaluate {
+          description = project.description
+        }
+        url = 'https://github.com/pukkaone/accession'
+
+        licenses {
+          license {
+            name = 'Apache License, Version 2.0'
+            url = 'https://www.apache.org/licenses/LICENSE-2.0'
+          }
+        }
+
+        developers {
+          developer {
+            id = 'pukkaone'
+            name = 'Chin Huang'
+          }
+        }
+
+        scm {
+          connection = 'scm:git:git@github.com:pukkaone/accession.git'
+          developerConnection = 'scm:git:git@github.com:pukkaone/accession.git'
+          url = 'https://github.com/pukkaone/accession'
+        }
+      }
+    }
+  }
+
+  repositories {
+    maven {
+      url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+      credentials {
+        username = findProperty('sonatypeUsername') ?: 'UNKNOWN'
+        password = findProperty('sonatypePassword') ?: 'UNKNOWN'
+      }
+    }
+  }
+}
+
+signing {
+  required { hasProperty('sonatypeUsername') && hasProperty('sonatypePassword') }
+  sign publishing.publications.library
+}
