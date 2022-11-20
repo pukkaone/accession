@@ -1,0 +1,3 @@
+spring:
+  application.name: schema-registry
+  main.banner-mode: 'off'
