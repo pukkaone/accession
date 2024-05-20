@@ -3,6 +3,7 @@ package com.github.pukkaone.accession.avro.reflect;
 import com.github.pukkaone.accession.persistence.CodeToEnumMapper;
 import com.github.pukkaone.accession.persistence.Codeable;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import org.apache.avro.Schema;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.Encoder;
@@ -16,8 +17,8 @@ import org.apache.avro.io.Encoder;
 public class CodeableIntegerEncoding<E extends Enum<E> & Codeable<Integer>>
     extends AbstractEncoding<E> {
 
-  private final String enumClassName;
-  private final CodeToEnumMapper<Integer, E> mapper;
+  private String enumClassName;
+  private CodeToEnumMapper<Integer, E> mapper;
 
   /**
    * Constructor.
@@ -26,6 +27,26 @@ public class CodeableIntegerEncoding<E extends Enum<E> & Codeable<Integer>>
    *     enum type
    */
   protected CodeableIntegerEncoding(Class<E> enumClass) {
+    initialize(enumClass);
+  }
+
+  /**
+   * Constructor.
+   */
+  @SuppressWarnings("unchecked")
+  protected CodeableIntegerEncoding() {
+    Class<E> enumClass = (Class<E>) ((ParameterizedType) getClass().getGenericSuperclass())
+        .getActualTypeArguments()[0];
+    initialize(enumClass);
+  }
+
+  /**
+   * Prepares encoding for enum.
+   *
+   * @param enumClass
+   *     enum class
+   */
+  protected void initialize(Class<E> enumClass) {
     enumClassName = enumClass.getName();
 
     schema = Schema.create(Schema.Type.INT);
