@@ -8,7 +8,7 @@ description = 'Maven plugin that puts schema in schema registry'
 
 ext {
   autoServiceVersion = '1.1.1'
-  mavenVersion = '3.9.6'
+  mavenVersion = '3.9.7'
   mavenPluginVersion = '3.13.0'
 }
 
