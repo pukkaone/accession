@@ -5,5 +5,5 @@ plugins {
 description = 'Schema registry core library'
 
 dependencies {
-  api 'org.apache.avro:avro:1.11.3'
+  api 'org.apache.avro:avro:1.12.0'
 }
