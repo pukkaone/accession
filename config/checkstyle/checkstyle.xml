@@ -254,7 +254,7 @@
     </module>
     <module name="Indentation">
       <property name="basicOffset" value="2"/>
-      <property name="braceAdjustment" value="2"/>
+      <property name="braceAdjustment" value="0"/>
       <property name="caseIndent" value="2"/>
       <property name="throwsIndent" value="4"/>
       <property name="lineWrappingIndentation" value="4"/>
@@ -340,7 +340,7 @@
     <module name="MissingJavadocMethod">
       <property name="scope" value="protected"/>
       <property name="minLineCount" value="-1"/>
-      <property name="allowedAnnotations" value="Bean, Override, Produces, Test"/>
+      <property name="allowedAnnotations" value="Bean, Override, Produces"/>
       <property name="tokens" value="METHOD_DEF, CTOR_DEF, ANNOTATION_FIELD_DEF,
                                    COMPACT_CTOR_DEF"/>
     </module>
