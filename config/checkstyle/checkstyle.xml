@@ -95,6 +95,11 @@
       <property name="tokens"
                 value="LITERAL_CASE, LITERAL_DEFAULT"/>
     </module>
+    <module name="SuppressionXpathSingleFilter">
+      <!-- LITERAL_CASE, LITERAL_DEFAULT are reused in SWITCH_RULE  -->
+      <property name="id" value="LeftCurlyNl"/>
+      <property name="query" value="//SWITCH_RULE/SLIST"/>
+    </module>
     <module name="RightCurly">
       <property name="id" value="RightCurlySame"/>
       <property name="tokens"
@@ -128,6 +133,7 @@
       <property name="allowEmptyMethods" value="true"/>
       <property name="allowEmptyTypes" value="true"/>
       <property name="allowEmptyLoops" value="true"/>
+      <property name="allowEmptySwitchBlockStatements" value="true"/>
       <property name="ignoreEnhancedForColon" value="false"/>
       <property name="tokens"
                value="ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR,
@@ -373,6 +379,7 @@
       <property name="scope" value="protected"/>
       <property name="allowMissingPropertyJavadoc" value="true"/>
       <property name="allowedAnnotations" value="Bean, Override, Produces"/>
+      <property name="ignoreMethodNamesRegex" value="^(message|groups|payload)$"/>
       <property name="tokens" value="METHOD_DEF, CTOR_DEF, ANNOTATION_FIELD_DEF,
                                    COMPACT_CTOR_DEF"/>
     </module>
